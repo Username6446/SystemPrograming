@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 
 namespace Project2_DZ_Threads
 {
@@ -25,7 +26,7 @@ namespace Project2_DZ_Threads
             for(int i = 0; i<data.Item3;i++)
             {
                 Thread thread = new Thread(Ex2);
-                thread.Start((data.Item1, data.Item2));
+                thread.Start(new Tuple<int, int>(data.Item1, data.Item2));
 
             }
             
@@ -61,6 +62,11 @@ namespace Project2_DZ_Threads
         {
             int[] arr = (int[])a!;
             File.AppendAllLines("Arr.txt", arr.Select(x => x.ToString()));
+            StringBuilder results = new StringBuilder("--- Results ---\n");
+            results.AppendLine($"Min: {arr.Min()}");
+            results.AppendLine($"Max: {arr.Max()}");
+            results.AppendLine($"Avg: {arr.Average()}");
+            File.AppendAllText("Arr.txt", results.ToString());
         }
         static void Ex4_5(object? a)
         {
@@ -79,6 +85,8 @@ namespace Project2_DZ_Threads
             Thread thread4 = new Thread(AvgArr);
             thread4.Start(arr);
             Thread thread5 = new Thread(PrintFileArr);
+
+            thread1.Join();
             thread5.Start(arr);
         }
         static void Main(string[] args)
