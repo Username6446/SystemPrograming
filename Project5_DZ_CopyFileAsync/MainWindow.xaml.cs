@@ -29,21 +29,49 @@ namespace Project5_DZ_CopyFileAsync
         private async void Button_Click(object sender, RoutedEventArgs e)
         {
             string source = fromTb.Text;
-            string destination = Path.Combine(toTb.Text, $"NewFile_{DateTime.Now.ToString("HHmmss")}.txt");
+            string targetFolder = toTb.Text;
+            string destination = Path.Combine(targetFolder, "CopiedFile_" + DateTime.Now.ToString("HHmmss") + ".txt");
+
+            var progressReporter = new Progress<double>(value =>
+            {
+                progressBar.Value = value;
+            });
+
             try
             {
-                string res = await CopyFileAsync(source, destination);
+                progressBar.Value = 0;
+                string fileName = await CopyFileWithProgressAsync(source, destination, progressReporter);
+
+                MessageBox.Show($"Файл {fileName} успішно скопійовано!");
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message);
+                MessageBox.Show("Помилка: " + ex.Message);
             }
         }
-        Task<string> CopyFileAsync(string source, string dest)
+        Task<string> CopyFileWithProgressAsync(string source, string dest, IProgress<double> progress)
         {
-            return Task.Run(() =>
+            return Task.Run(async () =>
             {
-                File.Copy(source, dest, true);
+                using (FileStream sourceStream = new FileStream(source, FileMode.Open, FileAccess.Read))
+                using (FileStream destStream = new FileStream(dest, FileMode.Create, FileAccess.Write))
+                {
+                    long totalBytes = sourceStream.Length;
+                    long totalRead = 0;
+                    byte[] buffer = new byte[1024 * 1024];
+                    int read;
+
+                    while ((read = await sourceStream.ReadAsync(buffer, 0, buffer.Length)) > 0)
+                    {
+                        await destStream.WriteAsync(buffer, 0, read);
+                        totalRead += read;
+
+                        double percentage = (double)totalRead / totalBytes * 100;
+
+                        progress?.Report(percentage);
+                        await Task.Delay(50);
+                    }
+                }
                 return Path.GetFileName(dest);
             });
         }

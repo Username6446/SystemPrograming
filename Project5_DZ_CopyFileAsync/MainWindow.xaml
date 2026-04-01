@@ -12,8 +12,7 @@
         <Label DockPanel.Dock="Top" Padding="10" FontSize="30">To:</Label>
         <TextBox Margin ="10" Padding="5" DockPanel.Dock="Top" x:Name="toTb"></TextBox>
         <Button DockPanel.Dock="Top"></Button>
-        <ProgressBar x:Name="progressBar" 
-                    IsIndeterminate="True" 
+        <ProgressBar x:Name="progressBar"  
                      Height="20" 
                      DockPanel.Dock="Bottom"></ProgressBar>
         <Button DockPanel.Dock="Top" 
