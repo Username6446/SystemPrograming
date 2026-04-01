@@ -6,53 +6,88 @@
     }
     class LockCounter
     {
-        private int number;
-        private int evenNumbers;
-        public int Number { get { return number; } set { } }
-        public int EvenNumbers { get { return evenNumbers; } set { } }
-        public void UpdateFields()
+        int number;//2
+        int evenNumber;//2
+        public int Number { get { return number; } }
+        public int EvenNumbers { get { return evenNumber; } }
+        public void UpdateFiels()
         {
-            for(int i = 0;i<1_000_000;i++)
+            for (int i = 0; i < 1_000_000; i++)
             {
                 lock (this)
                 {
-                    //Number++;
-                    Interlocked.Increment(ref number);
-                    if((Number % 2) == 0)
-                    {
-                        Interlocked.Increment(ref evenNumbers);
-                    }
+                    number++;// 2
+                    if (number % 2 == 0)
+                        evenNumber++;
+
                 }
+
             }
         }
     }
-    class LockCounterStatic
+    static class LockCounterStatic
     {
-        static int number;
-        static int evenNumbers;
-        public int Number { get { return number; } set { } }
-        public int EvenNumbers { get { return evenNumbers; } set { } }
-        public static void UpdateFields()
+        static int number;//2
+        static int evenNumber;//2
+        public static int Number { get { return number; } }
+        public static int EvenNumbers { get { return evenNumber; } }
+        public static void UpdateFiels()
         {
-            for(int i = 0;i<1_000_000;i++)
+            for (int i = 0; i < 1_000_000; i++)
             {
                 lock (typeof(LockCounterStatic))
                 {
-                    number++;
-                    if(number%2==0)
-                    {
-                        evenNumbers++;
-                    }
+                    number++;// 2
+                    if (number % 2 == 0)
+                        evenNumber++;
+
                 }
+
             }
         }
     }
+    class Statistic
+    {
+        public static int CountLetters { get; set; }
+        public static int CountNumbers { get; set; }
+
+    }
     internal class Program
     {
+        static void CountNumber()
+        {
+            for (int j = 0; j < 1_000_000; j++)
+            {
+                ++Counter.count;
+                Console.WriteLine(Counter.count);
+            }
+        }
         static void Main(string[] args)
         {
-            #region Problem
+            string root = @$"{Environment.GetFolderPath(Environment.SpecialFolder.Desktop)}\Test";
+            string[] files = Directory.GetFiles(root);
+            foreach (string file in files)
+            {
+                Console.WriteLine(file);
+            }
+            //Files - 5  Threads = 5
+            //TextAnalize(string text);
+
+
+
+
+            #region Thread Problem
+
+
+            //for (int i = 0; i < 5; i++)
+            //{
+            //    CountNumber();
+            //}
+
             //Thread[] threads = new Thread[5];
+            ////void Func()
+            ////void Func(object obj)
+
             //for (int i = 0; i < threads.Length; i++)
             //{
             //    threads[i] = new Thread(
@@ -65,16 +100,22 @@
             //        });
             //    threads[i].Start();
             //}
+
             //for (int i = 0; i < threads.Length; i++)
             //{
             //    threads[i].Join();
             //}
+            ////Console.ReadKey();
             //Console.WriteLine($"Counter : {Counter.count}");
-
             #endregion
-            #region Sync
-
+            #region Thread Sync
             //Thread[] threads = new Thread[5];
+            ////void Func()
+            ////void Func(object obj)
+            ////Interlocked.Increment - add + 1
+            ////Interlocked.Decrement - add - 1
+            ////Interlocked.Add - add + value
+            ////Interlocked.Exchange - add - value
 
             //for (int i = 0; i < threads.Length; i++)
             //{
@@ -88,12 +129,13 @@
             //        });
             //    threads[i].Start();
             //}
+
             //for (int i = 0; i < threads.Length; i++)
             //{
             //    threads[i].Join();
             //}
+            ////Console.ReadKey();
             //Console.WriteLine($"Counter : {Counter.count}");
-
             #endregion
             #region Lock Counter
             LockCounter counter = new LockCounter();
@@ -101,18 +143,20 @@
 
             for (int i = 0; i < threads.Length; i++)
             {
-                threads[i] = new Thread(counter.UpdateFields);
+
+                threads[i] = new Thread(counter.UpdateFiels);
                 threads[i].Start();
             }
+
             for (int i = 0; i < threads.Length; i++)
             {
                 threads[i].Join();
             }
-            Console.WriteLine($"All numbers : {counter.Number}");
-            Console.WriteLine($"Even numbers: {counter.EvenNumbers}");
-            
-
+            //Console.ReadKey();
+            Console.WriteLine($"All numbers : {counter.Number}");//5_000_000
+            Console.WriteLine($"Even numbers : {counter.EvenNumbers}");//2_500_000
             #endregion
+
         }
     }
 }
