@@ -66,7 +66,11 @@ namespace Project3_DZ_Interlocked
             Console.OutputEncoding = Encoding.UTF8;
 
             string root = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "Test");
-
+            if (!Directory.Exists(root))
+            {
+                Console.WriteLine("Помилка: Директорію 'Test' не знайдено на робочому столі.");
+                return;
+            }
             string[] files = Directory.GetFiles(root);
             List<Thread> threads = new List<Thread>();
 
